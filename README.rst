@@ -1,8 +1,12 @@
-************
-Project Name
-************
-
-Describe project here
+**************
+VulkanTriangle
+**************
+This repository stores a simple code base that prints a triangle to the 
+screen using the Vulkan graphics API.  The primary purpose of this repository 
+is to show the basic code that can be re-used in more complex projects and 
+to store an example of the CMakeLists.txt file that is used to build GLFW
+from scratch using X11 extensions, and to build the Vulkan code into an
+executable
 
 Contributing
 ############
@@ -14,18 +18,3 @@ License
 #######
 The License is included in the **project_name** package
 
-Requirements
-############
-Python 3.8 or greater
-List code package requirements here
-
-Installation
-############
-In order to download this repository from github, follow these instructions
-
-1. Ensure you have .git installed on your computer
-2. At your desired location create a directory titled ``project_name``
-3. Open a terminal (Bash, zsh, Linux, or DOS) and cd to the ``project_name`` directory and type
-   ``close https://github.com/Jon-Webb-79/Project_Name.git project_name``
-4. Install with pip3
-   ``pip3 install -r requirements``
