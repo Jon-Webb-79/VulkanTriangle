@@ -19,48 +19,41 @@
 // ================================================================================
 
 
-HelloTriangleApplication::HelloTriangleApplication(Window& instance) {
-    windowInstance = &instance;
+VulkanInstance::VulkanInstance(Window& window) : window(window) {
+    createInstance(); 
 }
 // --------------------------------------------------------------------------------
 
 
-HelloTriangleApplication::~HelloTriangleApplication() {
-    tearDown();
-}
-// --------------------------------------------------------------------------------
-
-
-void HelloTriangleApplication::run() {
-    
-    createInstance();
-
-    while (!windowInstance->windowShouldClose()) {
-        windowInstance->pollEvents();
+VulkanInstance::~VulkanInstance() {
+    if (instance != VK_NULL_HANDLE) {
+        vkDestroyInstance(instance, nullptr);
     }
 }
-// ================================================================================ 
+// --------------------------------------------------------------------------------
 
 
-void HelloTriangleApplication::createInstance() {
-    
-    // Populate VkApplicationInfo struct to describe this application 
+VkInstance* VulkanInstance::getInstance() {
+    return &instance;
+}
+// ================================================================================
+
+
+void VulkanInstance::createInstance() {
+    // Populate VkApplicationInfo struct to describe this application
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "VulkanTriangle";
     appInfo.applicationVersion = VK_MAKE_VERSION(0, 1, 0);
     appInfo.pEngineName = "No Engine";
-    appInfo.engineVersion= VK_MAKE_VERSION(1, 0, 0);
+    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_MAKE_VERSION(1, 3, 279);
 
-    // Variables used to helpf fined required extensions 
+    // Variables used to help find required extensions
     uint32_t extensionCount = 0;
-    const char** extensions;
+    const char** extensions = window.getRequiredInstanceExtensions(&extensionCount);
 
-    // Get list of required extensions as a pointer to a c-style array
-    extensions = windowInstance->getRequiredInstanceExtensions(&extensionCount);
-
-    // Implement VkInstanceCreateInfo struct 
+    // Implement VkInstanceCreateInfo struct
     VkInstanceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
@@ -68,31 +61,35 @@ void HelloTriangleApplication::createInstance() {
     createInfo.ppEnabledExtensionNames = extensions;
     createInfo.enabledLayerCount = 0;
 
-    // Use data in createInfo struct to create a VkInstance
+    // Create the Vulkan instance
     if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to Create Vulkan Instance!\n");
+        throw std::runtime_error("Failed to Create Vulkan Instance!");
     }
+}
+// ================================================================================
+// ================================================================================
 
-    uint32_t newExtensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &newExtensionCount, nullptr);
-
-    std::vector<VkExtensionProperties> newExtensions(newExtensionCount);
-    vkEnumerateInstanceExtensionProperties(nullptr, &newExtensionCount, newExtensions.data());
-
-    std::cout << "Avialable Extensions:\n";
-
-    for (const auto& extension : newExtensions) {
-        std::cout << '\t' << extension.extensionName << '\n';
-    }
+HelloTriangleApplication::HelloTriangleApplication(std::unique_ptr<Window> window, std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator)
+    : windowInstance(std::move(window)), vulkanInstanceCreator(std::move(vulkanInstanceCreator)) {
+    // Vulkan instance is created in the VulkanInstance constructor
 }
 // --------------------------------------------------------------------------------
 
+HelloTriangleApplication::~HelloTriangleApplication() {
+    // Vulkan instance is destroyed in the VulkanInstance destructor
+}
 
-void HelloTriangleApplication::tearDown() {
-    if (instance != VK_NULL_HANDLE) {
-        vkDestroyInstance(instance, nullptr);
-        instance = VK_NULL_HANDLE;
+void HelloTriangleApplication::run() {
+    while (!windowInstance->windowShouldClose()) {
+        windowInstance->pollEvents();
     }
+}
+// ================================================================================
+
+void HelloTriangleApplication::destroyResources() {
+    // Destroy Vulkan instance before the window
+    vulkanInstanceCreator.reset();
+    windowInstance.reset();
 }
 // ================================================================================
 // ================================================================================

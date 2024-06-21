@@ -17,17 +17,17 @@
 #include <iostream>
 #include <stdexcept>
 
-// Begin code
 int main(int argc, const char * argv[]) {
     try {
-        GlfwWindow window(650, 800, "Vulkan", false);
-        HelloTriangleApplication triangle(window);
+        auto window = std::make_unique<GlfwWindow>(650, 800, "Vulkan", false);
+        auto vulkanInstance = std::make_unique<VulkanInstance>(*window);
+        HelloTriangleApplication triangle(std::move(window), std::move(vulkanInstance));
         triangle.run();
     } catch(const std::exception& e) {
         std::cerr << e.what() << "\n";
         return EXIT_FAILURE;
     }
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
 // ================================================================================
 // ================================================================================

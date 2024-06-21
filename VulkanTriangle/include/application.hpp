@@ -19,6 +19,38 @@
 #define GLFW_INCLUDE_VULKAN  // <vulkan/vulkan.h>
 #include "window.hpp"
 #include <iostream>
+#include <vector>
+#include <memory>
+// ================================================================================
+// ================================================================================
+
+
+class CreateVulkanInstance {
+public:
+    virtual ~CreateVulkanInstance() = default;
+    virtual VkInstance* getInstance() = 0;
+};
+// ================================================================================
+// ================================================================================
+
+
+class VulkanInstance : public CreateVulkanInstance {
+public:
+    VulkanInstance(Window &window);
+// --------------------------------------------------------------------------------
+
+    ~VulkanInstance() override;
+// --------------------------------------------------------------------------------
+
+    VkInstance* getInstance() override;
+// ================================================================================
+private:
+    Window& window;
+    VkInstance instance = VK_NULL_HANDLE;
+// --------------------------------------------------------------------------------
+
+    void createInstance();
+};
 // ================================================================================
 // ================================================================================
 
@@ -29,23 +61,22 @@
  * The HelloTriangleApplication class initializes the Vulkan context, manages the rendering loop,
  * and interacts with the window system through a Window interface.
  */
+
 class HelloTriangleApplication {
 public:
-
     /**
      * @brief Constructs a new HelloTriangleApplication instance.
      * 
-     * @param instance A reference to a Window object that the application will use.
+     * @param window A reference to a Window object that the application will use.
+     * @param vulkanInstanceCreator A reference to a CreateVulkanInstance object for creating the Vulkan instance.
      */
-    HelloTriangleApplication(Window& instance);
-// --------------------------------------------------------------------------------
-    
+    HelloTriangleApplication(std::unique_ptr<Window> window, std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator);
+
     /**
      * @brief Destroys the HelloTriangleApplication instance.
      */
     ~HelloTriangleApplication();
-// --------------------------------------------------------------------------------
-    
+
     /**
      * @brief Runs the main application loop.
      * 
@@ -53,32 +84,13 @@ public:
      * and rendering frames until the window is closed.
      */
     void run();
-// ================================================================================
 
 private:
-
-    /**
-     * @brief A pointer to the Window instance used by the application.
-     * 
-     * The windowInstance attribute holds a reference to the Window object, allowing the application
-     * to interact with the window system for event polling and checking if the window should close.
-     */
-    Window* windowInstance;
-
-    // A Vulkan instance
-    VkInstance instance;
+    std::unique_ptr<Window> windowInstance;
+    std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator;
 // --------------------------------------------------------------------------------
 
-    /**
-     * @brief Create a Vulkan instance
-     */
-    void createInstance();
-// --------------------------------------------------------------------------------
-
-    /**
-     * @brief Manages the order of destructor calls to avoid a dangling pointer
-     */
-    void tearDown();
+    void destroyResources();
 };
 // ================================================================================
 // ================================================================================
