@@ -16,6 +16,7 @@
 #ifndef application_HPP
 #define application_HPP
 
+#define GLFW_INCLUDE_VULKAN  // <vulkan/vulkan.h>
 #include "window.hpp"
 #include <iostream>
 // ================================================================================
@@ -42,7 +43,7 @@ public:
     /**
      * @brief Destroys the HelloTriangleApplication instance.
      */
-    ~HelloTriangleApplication() = default;
+    ~HelloTriangleApplication();
 // --------------------------------------------------------------------------------
     
     /**
@@ -63,6 +64,21 @@ private:
      * to interact with the window system for event polling and checking if the window should close.
      */
     Window* windowInstance;
+
+    // A Vulkan instance
+    VkInstance instance;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Create a Vulkan instance
+     */
+    void createInstance();
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Manages the order of destructor calls to avoid a dangling pointer
+     */
+    void tearDown();
 };
 // ================================================================================
 // ================================================================================

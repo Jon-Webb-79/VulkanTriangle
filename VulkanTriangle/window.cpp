@@ -61,6 +61,11 @@ void GlfwWindow::pollEvents() {
 bool GlfwWindow::isInstance() {
     return glfw_terminated;
 }
+// --------------------------------------------------------------------------------
+
+const char** GlfwWindow::getRequiredInstanceExtensions(uint32_t* count) {
+    return glfwGetRequiredInstanceExtensions(count);
+}
 // ================================================================================
 // ================================================================================
 // eof
