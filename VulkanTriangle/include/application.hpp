@@ -25,23 +25,49 @@
 // ================================================================================
 
 
+/**
+ * @brief Abstract class to set interface for Vulkan Instance Creation
+ */
 class CreateVulkanInstance {
 public:
+    /**
+     * @brief Desctructor
+     */
     virtual ~CreateVulkanInstance() = default;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Returns a raw pointer to the instance of Vulkan
+     */
     virtual VkInstance* getInstance() = 0;
 };
 // ================================================================================
 // ================================================================================
 
 
+/**
+ * @brief This class creates an instance of Vulkan to support an 
+ * application that will draw a triangle to the screen
+ */
 class VulkanInstance : public CreateVulkanInstance {
 public:
+    /**
+     * @brief Constructor for the VulkanInstance class 
+     *
+     * @param window A reference to a Window object
+     */
     VulkanInstance(Window &window);
 // --------------------------------------------------------------------------------
 
+    /**
+     * @brief Destructor for the VulkanInstance class
+     */
     ~VulkanInstance() override;
 // --------------------------------------------------------------------------------
 
+    /**
+     * @brief Returns a raw pointer to the instance of Vulkan
+     */
     VkInstance* getInstance() override;
 // ================================================================================
 private:
@@ -49,6 +75,9 @@ private:
     VkInstance instance = VK_NULL_HANDLE;
 // --------------------------------------------------------------------------------
 
+    /**
+     * @brief Helper function that allows the constructor to create a Vulkan instance
+     */
     void createInstance();
 };
 // ================================================================================
@@ -71,11 +100,13 @@ public:
      * @param vulkanInstanceCreator A reference to a CreateVulkanInstance object for creating the Vulkan instance.
      */
     HelloTriangleApplication(std::unique_ptr<Window> window, std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator);
+// --------------------------------------------------------------------------------
 
     /**
      * @brief Destroys the HelloTriangleApplication instance.
      */
     ~HelloTriangleApplication();
+// --------------------------------------------------------------------------------
 
     /**
      * @brief Runs the main application loop.
@@ -84,12 +115,17 @@ public:
      * and rendering frames until the window is closed.
      */
     void run();
-
+// ================================================================================
 private:
+    // Utilizing smart pointers so I can control the order of destruction
     std::unique_ptr<Window> windowInstance;
     std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator;
 // --------------------------------------------------------------------------------
 
+    /**
+     * @breif Helper function that allows the destructor to control the order 
+     * of tear down
+     */
     void destroyResources();
 };
 // ================================================================================

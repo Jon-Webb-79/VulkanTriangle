@@ -1,8 +1,29 @@
+# ================================================================================
+# ================================================================================
+# - File:    CMakeLists.txt
+# - Purpose: Primary CMake file for C build system
+#
+# Source Metadata
+# - Author:  Jonathan A. Webb
+# - Date:    June 19, 2024
+# - Version: 1.0
+# - Copyright: Copyright 2024, Jonathan A. Webb Inc.
+# ================================================================================
+# ================================================================================
+
 cmake_minimum_required(VERSION 3.29.6)
 project(VulkanTriangle)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Set compiler flags
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wpedantic -O2")
+endif()
+
+# Additional flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -mtune=native -fPIE")
 
 # Include ExternalProject module to manage external dependencies
 include(ExternalProject)
@@ -38,6 +59,30 @@ execute_process(
 message(STATUS "Found glslangValidator: ${GLSLANG_VALIDATOR}")
 message(STATUS "glslangValidator version: ${GLSLANG_VALIDATOR_VERSION}")
 
+# Shader files
+# set(SHADERS
+#     ${CMAKE_SOURCE_DIR}/shaders/simple_shader.vert
+#     ${CMAKE_SOURCE_DIR}/shaders/simple_shader.frag
+# )
+#
+# # Compile shaders to SPIR-V
+# foreach(SHADER ${SHADERS})
+#     get_filename_component(FILE_NAME ${SHADER} NAME)
+#     set(SPIRV ${CMAKE_SOURCE_DIR}/shaders/${FILE_NAME}.spv)
+#
+#     add_custom_command(
+#         OUTPUT ${SPIRV}
+#         COMMAND ${GLSLANG_VALIDATOR} -V ${SHADER} -o ${SPIRV}
+#         DEPENDS ${SHADER}
+#         COMMENT "Compiling ${SHADER} to SPIR-V"
+#     )
+#
+#     list(APPEND SPIRV_SHADERS ${SPIRV})
+# endforeach()
+#
+# # Add custom target to build all shaders
+# add_custom_target(ShadersTarget ALL DEPENDS ${SPIRV_SHADERS})
+
 # Define the executable
 add_executable(VulkanTriangle 
                main.cpp
@@ -59,12 +104,6 @@ set_target_properties(VulkanTriangle PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
-# Additional flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -mtune=native -fPIE")
-
-# Set debug-specific compiler flags
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Werror -Wpedantic -g")
-
-# Set release-specific compiler flags
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Werror -Wpedantic -O2")
-
+# ================================================================================
+# ================================================================================
+# eof

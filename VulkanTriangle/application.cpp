@@ -76,15 +76,16 @@ HelloTriangleApplication::HelloTriangleApplication(std::unique_ptr<Window> windo
 // --------------------------------------------------------------------------------
 
 HelloTriangleApplication::~HelloTriangleApplication() {
-    // Vulkan instance is destroyed in the VulkanInstance destructor
+    destroyResources();
 }
+// --------------------------------------------------------------------------------
 
 void HelloTriangleApplication::run() {
     while (!windowInstance->windowShouldClose()) {
         windowInstance->pollEvents();
     }
 }
-// ================================================================================
+// --------------------------------------------------------------------------------
 
 void HelloTriangleApplication::destroyResources() {
     // Destroy Vulkan instance before the window
