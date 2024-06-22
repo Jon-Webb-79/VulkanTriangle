@@ -18,6 +18,7 @@
 
 #define GLFW_INCLUDE_VULKAN  // <vulkan/vulkan.h>
 #include "window.hpp"
+#include "validation_layers.hpp"
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -56,7 +57,7 @@ public:
      *
      * @param window A reference to a Window object
      */
-    VulkanInstance(Window &window);
+    VulkanInstance(Window &window, ValidationLayers& validationLayers);
 // --------------------------------------------------------------------------------
 
     /**
@@ -72,6 +73,7 @@ public:
 // ================================================================================
 private:
     Window& window;
+    ValidationLayers& validationLayers;
     VkInstance instance = VK_NULL_HANDLE;
 // --------------------------------------------------------------------------------
 

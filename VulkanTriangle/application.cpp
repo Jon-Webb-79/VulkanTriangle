@@ -18,15 +18,16 @@
 // ================================================================================
 // ================================================================================
 
-
-VulkanInstance::VulkanInstance(Window& window) : window(window) {
-    createInstance(); 
+VulkanInstance::VulkanInstance(Window& window, ValidationLayers& validationLayers)
+    : window(window), validationLayers(validationLayers) {
+    createInstance();
 }
 // --------------------------------------------------------------------------------
 
 
 VulkanInstance::~VulkanInstance() {
     if (instance != VK_NULL_HANDLE) {
+        validationLayers.cleanup(instance);
         vkDestroyInstance(instance, nullptr);
     }
 }
@@ -40,6 +41,10 @@ VkInstance* VulkanInstance::getInstance() {
 
 
 void VulkanInstance::createInstance() {
+    if (validationLayers.isEnabled() && !validationLayers.checkValidationLayerSupport()) {
+        throw std::runtime_error("validation layers requested, but not available!");
+    }
+
     // Populate VkApplicationInfo struct to describe this application
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -47,23 +52,45 @@ void VulkanInstance::createInstance() {
     appInfo.applicationVersion = VK_MAKE_VERSION(0, 1, 0);
     appInfo.pEngineName = "No Engine";
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.apiVersion = VK_MAKE_VERSION(1, 3, 279);
+    appInfo.apiVersion = VK_API_VERSION_1_3;
 
     // Variables used to help find required extensions
     uint32_t extensionCount = 0;
     const char** extensions = window.getRequiredInstanceExtensions(&extensionCount);
+    std::vector<const char*> extensionVector(extensions, extensions + extensionCount);
+
+    // If validation layers are enabled, add their required extensions
+    if (validationLayers.isEnabled()) {
+        std::vector<const char*> validationLayerExtensions = validationLayers.getRequiredExtensions();
+        extensionVector.insert(extensionVector.end(), validationLayerExtensions.begin(), validationLayerExtensions.end());
+    }
 
     // Implement VkInstanceCreateInfo struct
     VkInstanceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
-    createInfo.enabledExtensionCount = extensionCount;
-    createInfo.ppEnabledExtensionNames = extensions;
-    createInfo.enabledLayerCount = 0;
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensionVector.size());
+    createInfo.ppEnabledExtensionNames = extensionVector.data();
+
+    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
+    if (validationLayers.isEnabled()) {
+        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.getValidationLayers().size());
+        createInfo.ppEnabledLayerNames = validationLayers.getValidationLayers().data(); 
+        validationLayers.populateDebugMessengerCreateInfo(debugCreateInfo);
+        createInfo.pNext = &debugCreateInfo;
+    } else {
+        createInfo.enabledLayerCount = 0;
+        createInfo.ppEnabledLayerNames = nullptr;
+        createInfo.pNext = nullptr;
+    }
 
     // Create the Vulkan instance
     if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
         throw std::runtime_error("Failed to Create Vulkan Instance!");
+    }
+
+    if (validationLayers.isEnabled()) {
+        validationLayers.setupDebugMessenger(instance);
     }
 }
 // ================================================================================

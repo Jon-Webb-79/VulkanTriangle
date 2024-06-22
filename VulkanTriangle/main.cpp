@@ -14,14 +14,16 @@
 
 #include "include/application.hpp"
 #include "include/window.hpp"
+#include "include/validation_layers.hpp"
 #include <iostream>
 #include <stdexcept>
 
 int main(int argc, const char * argv[]) {
     try {
         auto window = std::make_unique<GlfwWindow>(650, 800, "Vulkan", false);
-        auto vulkanInstance = std::make_unique<VulkanInstance>(*window);
-        HelloTriangleApplication triangle(std::move(window), std::move(vulkanInstance));
+        ValidationLayers validationLayers;
+        std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator = std::make_unique<VulkanInstance>(*window, validationLayers);
+        HelloTriangleApplication triangle(std::move(window), std::move(vulkanInstanceCreator));
         triangle.run();
     } catch(const std::exception& e) {
         std::cerr << e.what() << "\n";
