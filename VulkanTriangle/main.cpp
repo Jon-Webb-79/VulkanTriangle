@@ -21,8 +21,8 @@
 int main(int argc, const char * argv[]) {
     try {
         auto window = std::make_unique<GlfwWindow>(650, 800, "Vulkan", false);
-        ValidationLayers validationLayers;
-        std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator = std::make_unique<VulkanInstance>(*window, validationLayers);
+        auto validationLayers = std::make_unique<ValidationLayers>(window.get());
+        std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator = std::make_unique<VulkanInstance>(*window, *validationLayers);
         HelloTriangleApplication triangle(std::move(window), std::move(vulkanInstanceCreator));
         triangle.run();
     } catch(const std::exception& e) {

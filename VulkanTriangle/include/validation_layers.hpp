@@ -18,6 +18,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <vector>
+#include <memory>
+#include "window.hpp"
 // ================================================================================
 // ================================================================================
 
@@ -53,7 +55,6 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
                                    const VkAllocationCallbacks* pAllocator);
 // ================================================================================
 // ================================================================================
-
 /**
  * @class ValidationLayers
  * @brief Handles setup and management of Vulkan validation layers.
@@ -63,7 +64,7 @@ public:
     /**
      * @brief Constructs the ValidationLayers object.
      */
-    ValidationLayers();
+    ValidationLayers(Window* window);
 // --------------------------------------------------------------------------------
 
     /**
@@ -127,6 +128,8 @@ public:
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 // ================================================================================ 
 private:
+
+    Window* window;
 
     /**
      * @brief Callback function for the Vulkan debug messenger.

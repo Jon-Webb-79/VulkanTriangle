@@ -43,7 +43,8 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
 // ================================================================================ 
 // ================================================================================
 
-ValidationLayers::ValidationLayers() {}
+
+ValidationLayers::ValidationLayers(Window* window) : window(window) {}
 // --------------------------------------------------------------------------------
 
 ValidationLayers::~ValidationLayers() {}
@@ -57,7 +58,7 @@ bool ValidationLayers::isEnabled() const {
 std::vector<const char*> ValidationLayers::getRequiredExtensions() const {
     uint32_t glfwExtensionCount = 0;
     const char** glfwExtensions;
-    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+    glfwExtensions = window->getRequiredInstanceExtensions(&glfwExtensionCount);
 
     std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
@@ -117,7 +118,7 @@ bool ValidationLayers::checkValidationLayerSupport() {
 
     return true;
 }
-// ================================================================================
+// --------------------------------------------------------------------------------
 
 const std::vector<const char*>& ValidationLayers::getValidationLayers() const {
     return validationLayers;
@@ -135,7 +136,7 @@ void ValidationLayers::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCre
                              VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     createInfo.pfnUserCallback = debugCallback;
 }
-// --------------------------------------------------------------------------------
+// ================================================================================
 
 VKAPI_ATTR VkBool32 VKAPI_CALL ValidationLayers::debugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
