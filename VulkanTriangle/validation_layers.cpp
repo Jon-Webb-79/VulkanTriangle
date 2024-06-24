@@ -44,7 +44,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
 // ================================================================================
 
 
-ValidationLayers::ValidationLayers(Window* window) : window(window) {}
+ValidationLayers::ValidationLayers(std::unique_ptr<Window>& window) : window(window) {}
 // --------------------------------------------------------------------------------
 
 ValidationLayers::~ValidationLayers() {}

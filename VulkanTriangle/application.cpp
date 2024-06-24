@@ -18,7 +18,7 @@
 // ================================================================================
 // ================================================================================
 
-VulkanInstance::VulkanInstance(Window& window, ValidationLayers& validationLayers)
+VulkanInstance::VulkanInstance(std::unique_ptr<Window>& window, std::unique_ptr<ValidationLayers>& validationLayers)
     : window(window), validationLayers(validationLayers) {
     createInstance();
 }
@@ -27,7 +27,7 @@ VulkanInstance::VulkanInstance(Window& window, ValidationLayers& validationLayer
 
 VulkanInstance::~VulkanInstance() {
     if (instance != VK_NULL_HANDLE) {
-        validationLayers.cleanup(instance);
+        validationLayers->cleanup(instance);
         vkDestroyInstance(instance, nullptr);
     }
 }
@@ -41,7 +41,7 @@ VkInstance* VulkanInstance::getInstance() {
 
 
 void VulkanInstance::createInstance() {
-    if (validationLayers.isEnabled() && !validationLayers.checkValidationLayerSupport()) {
+    if (validationLayers->isEnabled() && !validationLayers->checkValidationLayerSupport()) {
         throw std::runtime_error("validation layers requested, but not available!");
     }
 
@@ -56,12 +56,12 @@ void VulkanInstance::createInstance() {
 
     // Variables used to help find required extensions
     uint32_t extensionCount = 0;
-    const char** extensions = window.getRequiredInstanceExtensions(&extensionCount);
+    const char** extensions = window->getRequiredInstanceExtensions(&extensionCount);
     std::vector<const char*> extensionVector(extensions, extensions + extensionCount);
 
     // If validation layers are enabled, add their required extensions
-    if (validationLayers.isEnabled()) {
-        std::vector<const char*> validationLayerExtensions = validationLayers.getRequiredExtensions();
+    if (validationLayers->isEnabled()) {
+        std::vector<const char*> validationLayerExtensions = validationLayers->getRequiredExtensions();
         extensionVector.insert(extensionVector.end(), validationLayerExtensions.begin(), validationLayerExtensions.end());
     }
 
@@ -73,10 +73,10 @@ void VulkanInstance::createInstance() {
     createInfo.ppEnabledExtensionNames = extensionVector.data();
 
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-    if (validationLayers.isEnabled()) {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.getValidationLayers().size());
-        createInfo.ppEnabledLayerNames = validationLayers.getValidationLayers().data(); 
-        validationLayers.populateDebugMessengerCreateInfo(debugCreateInfo);
+    if (validationLayers->isEnabled()) {
+        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers->getValidationLayers().size());
+        createInfo.ppEnabledLayerNames = validationLayers->getValidationLayers().data(); 
+        validationLayers->populateDebugMessengerCreateInfo(debugCreateInfo);
         createInfo.pNext = &debugCreateInfo;
     } else {
         createInfo.enabledLayerCount = 0;
@@ -89,16 +89,22 @@ void VulkanInstance::createInstance() {
         throw std::runtime_error("Failed to Create Vulkan Instance!");
     }
 
-    if (validationLayers.isEnabled()) {
-        validationLayers.setupDebugMessenger(instance);
+    if (validationLayers->isEnabled()) {
+        validationLayers->setupDebugMessenger(instance);
     }
 }
 // ================================================================================
 // ================================================================================
 
-HelloTriangleApplication::HelloTriangleApplication(std::unique_ptr<Window> window, std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator)
-    : windowInstance(std::move(window)), vulkanInstanceCreator(std::move(vulkanInstanceCreator)) {
-    // Vulkan instance is created in the VulkanInstance constructor
+HelloTriangleApplication::HelloTriangleApplication(std::unique_ptr<Window>& window,
+                                                   std::unique_ptr<CreateVulkanInstance>& vulkanInstanceCreator,
+                                                   std::unique_ptr<VulkanPhysicalDevice>& physicalDevice,
+                                                   std::unique_ptr<VulkanLogicalDevice>& logicalDevice)
+    : windowInstance(window), 
+      vulkanInstanceCreator(vulkanInstanceCreator), 
+      physicalDevice(physicalDevice),
+      logicalDevice(logicalDevice){
+  //  physicalDevice = std::make_unique<VulkanPhysicalDevice>(*vulkanInstanceCreator->getInstance());
 }
 // --------------------------------------------------------------------------------
 
@@ -116,6 +122,8 @@ void HelloTriangleApplication::run() {
 
 void HelloTriangleApplication::destroyResources() {
     // Destroy Vulkan instance before the window
+    logicalDevice.reset();
+    physicalDevice.reset();
     vulkanInstanceCreator.reset();
     windowInstance.reset();
 }

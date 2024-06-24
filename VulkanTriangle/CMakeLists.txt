@@ -44,6 +44,8 @@ add_executable(VulkanTriangle
                window.cpp
                application.cpp
                validation_layers.cpp
+               devices.cpp
+               queues.cpp
 )
 
 # Include GLFW and Vulkan directories

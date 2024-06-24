@@ -64,7 +64,7 @@ public:
     /**
      * @brief Constructs the ValidationLayers object.
      */
-    ValidationLayers(Window* window);
+    ValidationLayers(std::unique_ptr<Window>& window);
 // --------------------------------------------------------------------------------
 
     /**
@@ -129,7 +129,7 @@ public:
 // ================================================================================ 
 private:
 
-    Window* window;
+    std::unique_ptr<Window>& window;
 
     /**
      * @brief Callback function for the Vulkan debug messenger.
