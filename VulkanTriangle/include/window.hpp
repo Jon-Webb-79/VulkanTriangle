@@ -74,6 +74,23 @@ public:
     * @return const char** An array of strings containing the names of the required extensions.
     */
     virtual const char** getRequiredInstanceExtensions(uint32_t* count) = 0;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Abstract method to create a window surface for interaction with Vulkan 
+     *
+     * This pure virtual method is used to establish an interface between the 
+     * window and a Vulkan instance.
+     *
+     * @param instance A Vulkan instance 
+     * @param allocator The required allocator or nullptr
+     * @param surface Where to store the handle of the surface.  This is set to 
+     *                VK_NULL_HANDLE if an error occurred
+     * @return VkResult 
+     */
+    virtual VkResult createWindowSurface(VkInstance instance, 
+                                         const VkAllocationCallbacks* allocator,
+                                         VkSurfaceKHR* surface) = 0;
 };
 // ================================================================================
 // ================================================================================
@@ -136,6 +153,23 @@ public:
     * @return const char** An array of strings containing the names of the required extensions.
     */
     const char** getRequiredInstanceExtensions(uint32_t* count) override;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Method to create a window surface for interaction with Vulkan 
+     *
+     * This pure virtual method is used to establish an interface between the 
+     * glfwWindow window and a Vulkan instance.
+     *
+     * @param instance A Vulkan instance 
+     * @param allocator The required allocator or nullptr
+     * @param surface Where to store the handle of the surface.  This is set to 
+     *                VK_NULL_HANDLE if an error occurred
+     * @return VkResult 
+     */
+    VkResult createWindowSurface(VkInstance instance, 
+                                 const VkAllocationCallbacks* allocator,
+                                 VkSurfaceKHR* surface) override;
 // ================================================================================
 private:
 

@@ -13,12 +13,15 @@
 // Include modules here
 
 #include "include/devices.hpp"
+#include "include/queues.hpp"
 #include <stdexcept>
 #include <vector>
+#include <set>
 // ================================================================================
 // ================================================================================
 
-VulkanPhysicalDevice::VulkanPhysicalDevice(VkInstance& instance) : instance(instance) {
+VulkanPhysicalDevice::VulkanPhysicalDevice(VkInstance& instance, VkSurfaceKHR surface) 
+    : instance(instance), surface(surface) {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 
@@ -48,48 +51,65 @@ VkPhysicalDevice VulkanPhysicalDevice::getPhysicalDevice() const {
 // --------------------------------------------------------------------------------
 
 bool VulkanPhysicalDevice::isDeviceSuitable(const VkPhysicalDevice& device) {
-    QueueFamilyIndices indices = QueueFamily::findQueueFamilies(device);
+    QueueFamilyIndices indices = QueueFamily::findQueueFamilies(device, surface);
     return indices.isComplete();
 }
 // ================================================================================ 
 // ================================================================================
 
-VulkanLogicalDevice::VulkanLogicalDevice(VkPhysicalDevice physicalDevice, const std::vector<const char*>& validationLayers)
-    : physicalDevice(physicalDevice), validationLayers(validationLayers) {
+VulkanLogicalDevice::VulkanLogicalDevice(VkPhysicalDevice physicalDevice, 
+                                         const std::vector<const char*>& validationLayers,
+                                         VkSurfaceKHR surface)
+    : physicalDevice(physicalDevice), 
+      validationLayers(validationLayers),
+      surface(surface){
     createLogicalDevice();
 }
+// --------------------------------------------------------------------------------
 
 VulkanLogicalDevice::~VulkanLogicalDevice() {
     if (device != VK_NULL_HANDLE) {
         vkDestroyDevice(device, nullptr);
     }
 }
+// --------------------------------------------------------------------------------
 
 VkDevice VulkanLogicalDevice::getDevice() const {
     return device;
 }
+// --------------------------------------------------------------------------------
 
 VkQueue VulkanLogicalDevice::getGraphicsQueue() const {
     return graphicsQueue;
 }
+// ================================================================================
 
 void VulkanLogicalDevice::createLogicalDevice() {
-    QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+    QueueFamilyIndices indices = QueueFamily::findQueueFamilies(physicalDevice, surface);
 
-    VkDeviceQueueCreateInfo queueCreateInfo{};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-    queueCreateInfo.queueCount = 1;
+    if (!indices.graphicsFamily.has_value() || !indices.presentFamily.has_value()) {
+        throw std::runtime_error("Failed to find required queue families.");
+    } 
+
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
     float queuePriority = 1.0f;
-    queueCreateInfo.pQueuePriorities = &queuePriority;
+    for (uint32_t queueFamily : uniqueQueueFamilies) {
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
 
     VkPhysicalDeviceFeatures deviceFeatures{};
 
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    createInfo.pQueueCreateInfos = &queueCreateInfo;
-    createInfo.queueCreateInfoCount = 1;
+    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+    createInfo.pQueueCreateInfos = queueCreateInfos.data();
     createInfo.pEnabledFeatures = &deviceFeatures;
     createInfo.enabledExtensionCount = 0;
 
@@ -105,32 +125,34 @@ void VulkanLogicalDevice::createLogicalDevice() {
     }
 
     vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
+    vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
 }
+// --------------------------------------------------------------------------------
 
-VulkanLogicalDevice::QueueFamilyIndices VulkanLogicalDevice::findQueueFamilies(VkPhysicalDevice device) {
-    QueueFamilyIndices indices;
-
-    uint32_t queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-
-    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
-
-    int i = 0;
-    for (const auto& queueFamily : queueFamilies) {
-        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-            indices.graphicsFamily = i;
-        }
-
-        if (indices.isComplete()) {
-            break;
-        }
-
-        i++;
-    }
-
-    return indices;
-}
+// VulkanLogicalDevice::QueueFamilyIndices VulkanLogicalDevice::findQueueFamilies(VkPhysicalDevice device) {
+//     QueueFamilyIndices indices;
+//
+//     uint32_t queueFamilyCount = 0;
+//     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+//
+//     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+//     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+//
+//     int i = 0;
+//     for (const auto& queueFamily : queueFamilies) {
+//         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+//             indices.graphicsFamily = i;
+//         }
+//
+//         if (indices.isComplete()) {
+//             break;
+//         }
+//
+//         i++;
+//     }
+//
+//     return indices;
+// }
 // ================================================================================
 // ================================================================================
 // eof

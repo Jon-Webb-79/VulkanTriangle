@@ -15,10 +15,11 @@
 #include "include/queues.hpp"
 #include <stdexcept>
 #include <vector>
+#include <iostream>
 // ================================================================================
 // ================================================================================
 
-QueueFamilyIndices QueueFamily::findQueueFamilies(VkPhysicalDevice device) {
+QueueFamilyIndices QueueFamily::findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface) {
     QueueFamilyIndices indices;
 
     uint32_t queueFamilyCount = 0;
@@ -33,11 +34,25 @@ QueueFamilyIndices QueueFamily::findQueueFamilies(VkPhysicalDevice device) {
             indices.graphicsFamily = i;
         }
 
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+
+        if (presentSupport) {
+            indices.presentFamily = i;
+        }
+
         if (indices.isComplete()) {
             break;
         }
 
         i++;
+    }
+
+    if (!indices.graphicsFamily.has_value()) {
+        std::cerr << "Failed to find graphics queue family." << std::endl;
+    }
+    if (!indices.presentFamily.has_value()) {
+        std::cerr << "Failed to find present queue family." << std::endl;
     }
 
     return indices;

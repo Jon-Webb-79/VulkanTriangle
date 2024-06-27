@@ -21,11 +21,16 @@
 VulkanInstance::VulkanInstance(std::unique_ptr<Window>& window, std::unique_ptr<ValidationLayers>& validationLayers)
     : window(window), validationLayers(validationLayers) {
     createInstance();
+    createSurface();
 }
 // --------------------------------------------------------------------------------
 
 
 VulkanInstance::~VulkanInstance() {
+    if (surface != VK_NULL_HANDLE) {
+        vkDestroySurfaceKHR(instance, surface, nullptr);
+    }
+
     if (instance != VK_NULL_HANDLE) {
         validationLayers->cleanup(instance);
         vkDestroyInstance(instance, nullptr);
@@ -36,6 +41,11 @@ VulkanInstance::~VulkanInstance() {
 
 VkInstance* VulkanInstance::getInstance() {
     return &instance;
+}
+// --------------------------------------------------------------------------------
+
+VkSurfaceKHR VulkanInstance::getSurface() const {
+    return surface;
 }
 // ================================================================================
 
@@ -92,6 +102,12 @@ void VulkanInstance::createInstance() {
     if (validationLayers->isEnabled()) {
         validationLayers->setupDebugMessenger(instance);
     }
+}
+// --------------------------------------------------------------------------------
+
+void VulkanInstance::createSurface() {
+    if (window->createWindowSurface(instance, nullptr, &surface) != VK_SUCCESS)
+        throw std::runtime_error("Failed to create window surface\n");
 }
 // ================================================================================
 // ================================================================================

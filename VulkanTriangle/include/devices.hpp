@@ -39,7 +39,7 @@ public:
      * 
      * @param instance A reference to the Vulkan instance.
      */
-    VulkanPhysicalDevice(VkInstance& instance);
+    VulkanPhysicalDevice(VkInstance& instance, VkSurfaceKHR surface);
 // --------------------------------------------------------------------------------
 
     /**
@@ -53,6 +53,7 @@ public:
 private:
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkInstance& instance;
+    VkSurfaceKHR surface;
 // --------------------------------------------------------------------------------
     
     /**
@@ -84,8 +85,11 @@ public:
      * 
      * @param physicalDevice A reference to the Vulkan physical device.
      * @param validationLayers A vector containing the names of the validation layers to be enabled.
+     * @param surface A VkSurfaceKHR data type
      */
-    VulkanLogicalDevice(VkPhysicalDevice physicalDevice, const std::vector<const char*>& validationLayers);
+    VulkanLogicalDevice(VkPhysicalDevice physicalDevice, 
+                        const std::vector<const char*>& validationLayers,
+                        VkSurfaceKHR surface);
 // --------------------------------------------------------------------------------
     
     /**
@@ -110,21 +114,32 @@ public:
      * @return The Vulkan graphics queue handle.
      */
     VkQueue getGraphicsQueue() const;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Retrives the present queue 
+     *
+     * @return The vulkan queue handle
+     */
+    VkQueue getPresentQueue() const;
 // ================================================================================
 private:
     VkDevice device = VK_NULL_HANDLE;
     VkQueue graphicsQueue;
+    VkQueue presentQueue;
     VkPhysicalDevice physicalDevice;  // Changed to reference
     const std::vector<const char*>& validationLayers;
+    VkSurfaceKHR surface;
 // --------------------------------------------------------------------------------
 
-    // Queue family indices struct
-    struct QueueFamilyIndices {
-        std::optional<uint32_t> graphicsFamily;
-        bool isComplete() const {
-            return graphicsFamily.has_value();
-        }
-    };
+    // // Queue family indices struct
+    // struct QueueFamilyIndices {
+    //     std::optional<uint32_t> graphicsFamily;
+    //     std::optional<uint32_t> presentFamily;
+    //     bool isComplete() const {
+    //         return graphicsFamily.has_value() && presentFamily.has_value();
+    //     }
+    // };
 // --------------------------------------------------------------------------------
 
     /**
@@ -139,7 +154,7 @@ private:
      * @param device The Vulkan physical device to query.
      * @return A QueueFamilyIndices struct containing the indices of the required queue families.
      */
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);  // Add declaration
+//    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);  // Add declaration
 };
 // ================================================================================
 // ================================================================================ 

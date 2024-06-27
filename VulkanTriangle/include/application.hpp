@@ -43,6 +43,12 @@ public:
      * @brief Returns a raw pointer to the instance of Vulkan
      */
     virtual VkInstance* getInstance() = 0;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Returns a raw pointer to an instance of surface
+     */
+    virtual VkSurfaceKHR getSurface() const = 0;
 };
 // ================================================================================
 // ================================================================================
@@ -72,17 +78,30 @@ public:
      * @brief Returns a raw pointer to the instance of Vulkan
      */
     VkInstance* getInstance() override;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Returns a raw pointer to an instance of surface
+     */
+    VkSurfaceKHR getSurface() const override;
 // ================================================================================
 private:
     std::unique_ptr<Window>& window;
     std::unique_ptr<ValidationLayers>& validationLayers;
     VkInstance instance = VK_NULL_HANDLE;
+    VkSurfaceKHR surface;
 // --------------------------------------------------------------------------------
 
     /**
      * @brief Helper function that allows the constructor to create a Vulkan instance
      */
     void createInstance();
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Helper function that establishes a relationship between Vulkan and the window
+     */
+    void createSurface();
 };
 // ================================================================================
 // ================================================================================
@@ -129,6 +148,9 @@ private:
     std::unique_ptr<CreateVulkanInstance>& vulkanInstanceCreator;
     std::unique_ptr<VulkanPhysicalDevice>& physicalDevice;
     std::unique_ptr<VulkanLogicalDevice>& logicalDevice;
+
+    VkQueue graphicsQueue;
+    VkQueue presentQueue;
 // --------------------------------------------------------------------------------
 
     /**

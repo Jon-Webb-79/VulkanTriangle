@@ -66,6 +66,14 @@ bool GlfwWindow::isInstance() {
 const char** GlfwWindow::getRequiredInstanceExtensions(uint32_t* count) {
     return glfwGetRequiredInstanceExtensions(count);
 }
+// --------------------------------------------------------------------------------
+
+
+VkResult GlfwWindow::createWindowSurface(VkInstance instance,
+                                         const VkAllocationCallbacks* allocator,
+                                         VkSurfaceKHR* surface) {
+    return glfwCreateWindowSurface(instance, window, allocator, surface);
+}
 // ================================================================================
 // ================================================================================
 // eof
