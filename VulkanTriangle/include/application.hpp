@@ -125,7 +125,8 @@ public:
     HelloTriangleApplication(std::unique_ptr<Window>& window, 
                              std::unique_ptr<CreateVulkanInstance>& vulkanInstanceCreator,
                              std::unique_ptr<VulkanPhysicalDevice>& physicalDevice,
-                             std::unique_ptr<VulkanLogicalDevice>& logicalDevice);
+                             std::unique_ptr<VulkanLogicalDevice>& logicalDevice,
+                             std::unique_ptr<SwapChain>& swapChain);
 // --------------------------------------------------------------------------------
 
     /**
@@ -148,6 +149,7 @@ private:
     std::unique_ptr<CreateVulkanInstance>& vulkanInstanceCreator;
     std::unique_ptr<VulkanPhysicalDevice>& physicalDevice;
     std::unique_ptr<VulkanLogicalDevice>& logicalDevice;
+    std::unique_ptr<SwapChain>& swapChain;
 
     VkQueue graphicsQueue;
     VkQueue presentQueue;

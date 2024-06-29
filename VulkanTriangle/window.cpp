@@ -18,7 +18,10 @@
 // ================================================================================
 
 
-GlfwWindow::GlfwWindow(uint32_t h, uint32_t w, const std::string& screen_title, bool full_screen) {
+GlfwWindow::GlfwWindow(uint32_t h, 
+                       uint32_t w, 
+                       const std::string& screen_title, 
+                       bool full_screen) {
     if (!glfwInit()) {
         throw std::runtime_error("GLFW Initialization Failed!\n");
     }
@@ -29,6 +32,8 @@ GlfwWindow::GlfwWindow(uint32_t h, uint32_t w, const std::string& screen_title, 
 
     GLFWmonitor* monitor = full_screen ? glfwGetPrimaryMonitor() : nullptr;
 
+    width = w;
+    height = h;
     window = glfwCreateWindow(w, h, screen_title.c_str(), monitor, nullptr);
 
     if (!window) {
@@ -73,6 +78,21 @@ VkResult GlfwWindow::createWindowSurface(VkInstance instance,
                                          const VkAllocationCallbacks* allocator,
                                          VkSurfaceKHR* surface) {
     return glfwCreateWindowSurface(instance, window, allocator, surface);
+}
+// --------------------------------------------------------------------------------
+
+void GlfwWindow::getFrameBufferSize() {
+    glfwGetFramebufferSize(window, reinterpret_cast<int*>(&width), reinterpret_cast<int*>(&height));
+}
+// --------------------------------------------------------------------------------
+
+uint32_t GlfwWindow::get_width() {
+    return width;
+}
+// --------------------------------------------------------------------------------
+
+uint32_t GlfwWindow::get_height() {
+    return height;
 }
 // ================================================================================
 // ================================================================================

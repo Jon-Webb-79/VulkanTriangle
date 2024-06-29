@@ -15,6 +15,7 @@
 #include "include/application.hpp"
 #include "include/window.hpp"
 #include "include/validation_layers.hpp"
+#include "include/constants.hpp"
 #include <iostream>
 #include <stdexcept>
 
@@ -27,8 +28,17 @@ int main(int argc, const char * argv[]) {
                                                                      vulkanInstanceCreator->getSurface());
         auto logicalDevice = std::make_unique<VulkanLogicalDevice>(physicalDevice->getPhysicalDevice(), 
                                                                    validationLayers->getValidationLayers(),
-                                                                   vulkanInstanceCreator->getSurface());
-        HelloTriangleApplication triangle(window, vulkanInstanceCreator, physicalDevice, logicalDevice);
+                                                                   vulkanInstanceCreator->getSurface(),
+                                                                   deviceExtensions);
+        auto swapChain = std::make_unique<SwapChain>(logicalDevice->getDevice(), 
+                                                     vulkanInstanceCreator->getSurface(), 
+                                                     physicalDevice->getPhysicalDevice(), 
+                                                     window.get());
+        HelloTriangleApplication triangle(window, 
+                                          vulkanInstanceCreator, 
+                                          physicalDevice, 
+                                          logicalDevice,
+                                          swapChain);
         triangle.run();
     } catch(const std::exception& e) {
         std::cerr << e.what() << "\n";

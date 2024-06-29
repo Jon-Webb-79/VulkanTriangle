@@ -91,6 +91,27 @@ public:
     virtual VkResult createWindowSurface(VkInstance instance, 
                                          const VkAllocationCallbacks* allocator,
                                          VkSurfaceKHR* surface) = 0;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Abstract method to retrieve the size, in pixels, of the framebuffer of the window.
+     *
+     * This pure virtual method must be implemented by derived classes to obtain the framebuffer size
+     * and store it in the width and height attributes.
+     */
+    virtual void getFrameBufferSize() = 0;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Abstract method to retrive the height of a screen in pixes.
+     */
+    virtual uint32_t get_height() = 0;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Abstract method to retrieve the width of a screen in pixels.
+     */
+    virtual uint32_t get_width() = 0;
 };
 // ================================================================================
 // ================================================================================
@@ -170,14 +191,32 @@ public:
     VkResult createWindowSurface(VkInstance instance, 
                                  const VkAllocationCallbacks* allocator,
                                  VkSurfaceKHR* surface) override;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief This method retrives the size, in pixels, of hte framebuffer of the specified window
+     */
+    void getFrameBufferSize() override;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief returns the width of a screen in units of pixesl
+     */
+    uint32_t get_width() override;
+// --------------------------------------------------------------------------------
+
+    /**
+     * @brief Returns the height of a screen in units of pixels
+     */
+    uint32_t get_height() override;
 // ================================================================================
 private:
 
-    /**
-     * @brief Pointer to the GLFW window instance.
-     */
+    uint32_t height;
+    uint32_t width;
     GLFWwindow* window;
-    
+// --------------------------------------------------------------------------------
+
     /**
      * @brief Indicates whether GLFW has been terminated.
      */

@@ -17,6 +17,7 @@
 
 #include <vulkan/vulkan.h>
 #include "queues.hpp"
+#include "window.hpp"
 #include <memory>
 #include <vector>
 // ================================================================================
@@ -62,7 +63,10 @@ private:
      * @param device The Vulkan physical device to check.
      * @return True if the device is suitable, false otherwise.
      */
-    bool isDeviceSuitable(const VkPhysicalDevice& device);
+    bool isDeviceSuitable(const VkPhysicalDevice device);
+// --------------------------------------------------------------------------------
+
+    bool checkDeviceExtensionSupport(const VkPhysicalDevice& device);
 };
 // ================================================================================
 // ================================================================================
@@ -89,7 +93,8 @@ public:
      */
     VulkanLogicalDevice(VkPhysicalDevice physicalDevice, 
                         const std::vector<const char*>& validationLayers,
-                        VkSurfaceKHR surface);
+                        VkSurfaceKHR surface,
+                        const std::vector<const char*>& deviceExtensions);
 // --------------------------------------------------------------------------------
     
     /**
@@ -130,31 +135,69 @@ private:
     VkPhysicalDevice physicalDevice;  // Changed to reference
     const std::vector<const char*>& validationLayers;
     VkSurfaceKHR surface;
-// --------------------------------------------------------------------------------
-
-    // // Queue family indices struct
-    // struct QueueFamilyIndices {
-    //     std::optional<uint32_t> graphicsFamily;
-    //     std::optional<uint32_t> presentFamily;
-    //     bool isComplete() const {
-    //         return graphicsFamily.has_value() && presentFamily.has_value();
-    //     }
-    // };
+    const std::vector<const char*>& deviceExtensions; 
 // --------------------------------------------------------------------------------
 
     /**
      * @brief Creates the logical device and retrieves the graphics queue.
      */
     void createLogicalDevice();
+};
+// ================================================================================
+// ================================================================================
+
+struct SwapChainSupportDetails {
+    VkSurfaceCapabilitiesKHR capabilities;
+    std::vector<VkSurfaceFormatKHR> formats;
+    std::vector<VkPresentModeKHR> presentModes;
+};
+// ================================================================================
+// ================================================================================
+
+class SwapChain {
+public:
+    SwapChain(VkDevice device, VkSurfaceKHR surface, VkPhysicalDevice physicalDevice, Window* window);
 // --------------------------------------------------------------------------------
 
-    /**
-     * @brief Finds the queue families that support the required operations.
-     * 
-     * @param device The Vulkan physical device to query.
-     * @return A QueueFamilyIndices struct containing the indices of the required queue families.
-     */
-//    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);  // Add declaration
+    ~SwapChain();
+// --------------------------------------------------------------------------------
+
+    VkSwapchainKHR getSwapChain() const;
+// --------------------------------------------------------------------------------
+
+    VkFormat getSwapChainImageFormat() const;
+// --------------------------------------------------------------------------------
+
+    VkExtent2D getSwapChainExtent() const;
+// --------------------------------------------------------------------------------
+
+    const std::vector<VkImage>& getSwapChainImages() const;
+// --------------------------------------------------------------------------------
+
+    static SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
+// ================================================================================
+private:
+    VkDevice device;
+    VkSurfaceKHR surface;
+    VkPhysicalDevice physicalDevice;
+    Window* window;
+
+    VkSwapchainKHR swapChain = VK_NULL_HANDLE;
+    VkFormat swapChainImageFormat;
+    VkExtent2D swapChainExtent;
+    std::vector<VkImage> swapChainImages;
+// --------------------------------------------------------------------------------
+
+    void createSwapChain();
+// --------------------------------------------------------------------------------
+
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+// --------------------------------------------------------------------------------
+
+    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+// --------------------------------------------------------------------------------
+
+    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 };
 // ================================================================================
 // ================================================================================ 
