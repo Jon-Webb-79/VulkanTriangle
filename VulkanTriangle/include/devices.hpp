@@ -174,6 +174,9 @@ public:
     const std::vector<VkImage>& getSwapChainImages() const;
 // --------------------------------------------------------------------------------
 
+    const std::vector<VkImageView>& getSwapChainImageViews() const;
+// --------------------------------------------------------------------------------
+
     static SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 // ================================================================================
 private:
@@ -186,9 +189,16 @@ private:
     VkFormat swapChainImageFormat;
     VkExtent2D swapChainExtent;
     std::vector<VkImage> swapChainImages;
+    std::vector<VkImageView> swapChainImageViews;
 // --------------------------------------------------------------------------------
 
     void createSwapChain();
+// --------------------------------------------------------------------------------
+
+    void createImageViews();
+// --------------------------------------------------------------------------------
+
+    void cleanupImageViews();
 // --------------------------------------------------------------------------------
 
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
