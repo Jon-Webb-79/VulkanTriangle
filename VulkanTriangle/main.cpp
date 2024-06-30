@@ -34,11 +34,11 @@ int main(int argc, const char * argv[]) {
                                                      vulkanInstanceCreator->getSurface(), 
                                                      physicalDevice->getPhysicalDevice(), 
                                                      window.get());
-        HelloTriangleApplication triangle(window, 
-                                          vulkanInstanceCreator, 
-                                          physicalDevice, 
-                                          logicalDevice,
-                                          swapChain);
+        HelloTriangleApplication triangle(std::move(window), 
+                                          std::move(vulkanInstanceCreator), 
+                                          std::move(physicalDevice), 
+                                          std::move(logicalDevice),
+                                          std::move(swapChain));
         triangle.run();
     } catch(const std::exception& e) {
         std::cerr << e.what() << "\n";

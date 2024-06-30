@@ -122,11 +122,11 @@ public:
      * @param window A reference to a Window object that the application will use.
      * @param vulkanInstanceCreator A reference to a CreateVulkanInstance object for creating the Vulkan instance.
      */
-    HelloTriangleApplication(std::unique_ptr<Window>& window, 
-                             std::unique_ptr<CreateVulkanInstance>& vulkanInstanceCreator,
-                             std::unique_ptr<VulkanPhysicalDevice>& physicalDevice,
-                             std::unique_ptr<VulkanLogicalDevice>& logicalDevice,
-                             std::unique_ptr<SwapChain>& swapChain);
+    HelloTriangleApplication(std::unique_ptr<Window> window, 
+                             std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator,
+                             std::unique_ptr<VulkanPhysicalDevice> physicalDevice,
+                             std::unique_ptr<VulkanLogicalDevice> logicalDevice,
+                             std::unique_ptr<SwapChain> swapChain);
 // --------------------------------------------------------------------------------
 
     /**
@@ -145,11 +145,11 @@ public:
 // ================================================================================
 private:
     // Utilizing smart pointers so I can control the order of destruction
-    std::unique_ptr<Window>& windowInstance;
-    std::unique_ptr<CreateVulkanInstance>& vulkanInstanceCreator;
-    std::unique_ptr<VulkanPhysicalDevice>& physicalDevice;
-    std::unique_ptr<VulkanLogicalDevice>& logicalDevice;
-    std::unique_ptr<SwapChain>& swapChain;
+    std::unique_ptr<Window> windowInstance;
+    std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator;
+    std::unique_ptr<VulkanPhysicalDevice> physicalDevice;
+    std::unique_ptr<VulkanLogicalDevice> logicalDevice;
+    std::unique_ptr<SwapChain> swapChain;
 
     VkQueue graphicsQueue;
     VkQueue presentQueue;

@@ -112,16 +112,16 @@ void VulkanInstance::createSurface() {
 // ================================================================================
 // ================================================================================
 
-HelloTriangleApplication::HelloTriangleApplication(std::unique_ptr<Window>& window,
-                                                   std::unique_ptr<CreateVulkanInstance>& vulkanInstanceCreator,
-                                                   std::unique_ptr<VulkanPhysicalDevice>& physicalDevice,
-                                                   std::unique_ptr<VulkanLogicalDevice>& logicalDevice,
-                                                   std::unique_ptr<SwapChain>& swapChain)
-    : windowInstance(window), 
-      vulkanInstanceCreator(vulkanInstanceCreator), 
-      physicalDevice(physicalDevice),
-      logicalDevice(logicalDevice),
-      swapChain(swapChain){}
+HelloTriangleApplication::HelloTriangleApplication(std::unique_ptr<Window> window,
+                                                   std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator,
+                                                   std::unique_ptr<VulkanPhysicalDevice> physicalDevice,
+                                                   std::unique_ptr<VulkanLogicalDevice> logicalDevice,
+                                                   std::unique_ptr<SwapChain> swapChain)
+    : windowInstance(std::move(window)), 
+      vulkanInstanceCreator(std::move(vulkanInstanceCreator)), 
+      physicalDevice(std::move(physicalDevice)),
+      logicalDevice(std::move(logicalDevice)),
+      swapChain(std::move(swapChain)){}
 // --------------------------------------------------------------------------------
 
 HelloTriangleApplication::~HelloTriangleApplication() {
