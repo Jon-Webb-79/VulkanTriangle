@@ -20,6 +20,7 @@
 #include "window.hpp"
 #include "validation_layers.hpp"
 #include "devices.hpp"
+#include "graphics_pipeline.hpp"
 
 #include <iostream>
 #include <vector>
@@ -126,7 +127,8 @@ public:
                              std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator,
                              std::unique_ptr<VulkanPhysicalDevice> physicalDevice,
                              std::unique_ptr<VulkanLogicalDevice> logicalDevice,
-                             std::unique_ptr<SwapChain> swapChain);
+                             std::unique_ptr<SwapChain> swapChain,
+                             std::unique_ptr<GraphicsPipeline> pipeline);
 // --------------------------------------------------------------------------------
 
     /**
@@ -150,6 +152,7 @@ private:
     std::unique_ptr<VulkanPhysicalDevice> physicalDevice;
     std::unique_ptr<VulkanLogicalDevice> logicalDevice;
     std::unique_ptr<SwapChain> swapChain;
+    std::unique_ptr<GraphicsPipeline> pipeline;
 
     VkQueue graphicsQueue;
     VkQueue presentQueue;

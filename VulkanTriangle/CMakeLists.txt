@@ -38,6 +38,30 @@ execute_process(
 message(STATUS "Found glslangValidator: ${GLSLANG_VALIDATOR}")
 message(STATUS "glslangValidator version: ${GLSLANG_VALIDATOR_VERSION}")
 
+# Shader files
+set(SHADERS
+    ${CMAKE_SOURCE_DIR}/shaders/shader.vert
+    ${CMAKE_SOURCE_DIR}/shaders/shader.frag
+)
+
+# Compile shaders to SPIR-V
+foreach(SHADER ${SHADERS})
+    get_filename_component(FILE_NAME ${SHADER} NAME)
+    set(SPIRV ${CMAKE_SOURCE_DIR}/shaders/${FILE_NAME}.spv)
+
+    add_custom_command(
+        OUTPUT ${SPIRV}
+        COMMAND ${GLSLANG_VALIDATOR} -V ${SHADER} -o ${SPIRV}
+        DEPENDS ${SHADER}
+        COMMENT "Compiling ${SHADER} to SPIR-V"
+    )
+
+    list(APPEND SPIRV_SHADERS ${SPIRV})
+endforeach()
+
+# Add custom target to build all shaders
+add_custom_target(ShadersTarget ALL DEPENDS ${SPIRV_SHADERS})
+
 # Define the executable
 add_executable(VulkanTriangle 
                main.cpp
@@ -46,12 +70,19 @@ add_executable(VulkanTriangle
                validation_layers.cpp
                devices.cpp
                queues.cpp
+               graphics_pipeline.cpp
 )
+
+# Make VulkanTriangle dependent on ShadersTarget
+add_dependencies(VulkanTriangle ShadersTarget)
 
 # Include GLFW and Vulkan directories
 ExternalProject_Get_Property(glfw source_dir binary_dir)
 target_include_directories(VulkanTriangle PRIVATE ${source_dir}/include)
 target_include_directories(VulkanTriangle PRIVATE ${Vulkan_INCLUDE_DIRS})
+
+# Include shaders directory
+target_include_directories(VulkanTriangle PRIVATE ${CMAKE_SOURCE_DIR}/shaders)
 
 # Link the GLFW and Vulkan libraries and add the necessary linker flags
 add_dependencies(VulkanTriangle glfw)

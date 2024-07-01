@@ -116,12 +116,14 @@ HelloTriangleApplication::HelloTriangleApplication(std::unique_ptr<Window> windo
                                                    std::unique_ptr<CreateVulkanInstance> vulkanInstanceCreator,
                                                    std::unique_ptr<VulkanPhysicalDevice> physicalDevice,
                                                    std::unique_ptr<VulkanLogicalDevice> logicalDevice,
-                                                   std::unique_ptr<SwapChain> swapChain)
+                                                   std::unique_ptr<SwapChain> swapChain,
+                                                   std::unique_ptr<GraphicsPipeline> pipeline)
     : windowInstance(std::move(window)), 
       vulkanInstanceCreator(std::move(vulkanInstanceCreator)), 
       physicalDevice(std::move(physicalDevice)),
       logicalDevice(std::move(logicalDevice)),
-      swapChain(std::move(swapChain)){}
+      swapChain(std::move(swapChain)),
+      pipeline(std::move(pipeline)){}
 // --------------------------------------------------------------------------------
 
 HelloTriangleApplication::~HelloTriangleApplication() {
@@ -138,6 +140,7 @@ void HelloTriangleApplication::run() {
 
 void HelloTriangleApplication::destroyResources() {
     // Destroy Vulkan instance before the window
+    pipeline.reset();
     swapChain.reset();
     logicalDevice.reset();
     physicalDevice.reset();

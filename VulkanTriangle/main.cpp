@@ -16,6 +16,7 @@
 #include "include/window.hpp"
 #include "include/validation_layers.hpp"
 #include "include/constants.hpp"
+#include "include/graphics_pipeline.hpp"
 #include <iostream>
 #include <stdexcept>
 
@@ -34,11 +35,15 @@ int main(int argc, const char * argv[]) {
                                                      vulkanInstanceCreator->getSurface(), 
                                                      physicalDevice->getPhysicalDevice(), 
                                                      window.get());
+        auto pipeline = std::make_unique<GraphicsPipeline>(logicalDevice->getDevice(), 
+                                                           swapChain->getSwapChainExtent(), 
+                                                           swapChain->getSwapChainImageFormat());
         HelloTriangleApplication triangle(std::move(window), 
                                           std::move(vulkanInstanceCreator), 
                                           std::move(physicalDevice), 
                                           std::move(logicalDevice),
-                                          std::move(swapChain));
+                                          std::move(swapChain),
+                                          std::move(pipeline));
         triangle.run();
     } catch(const std::exception& e) {
         std::cerr << e.what() << "\n";
