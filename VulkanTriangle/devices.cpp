@@ -113,6 +113,11 @@ VkDevice VulkanLogicalDevice::getDevice() const {
 VkQueue VulkanLogicalDevice::getGraphicsQueue() const {
     return graphicsQueue;
 }
+// --------------------------------------------------------------------------------
+
+VkQueue VulkanLogicalDevice::getPresentQueue() const {
+    return presentQueue;
+}
 // ================================================================================
 
 void VulkanLogicalDevice::createLogicalDevice() {

@@ -47,7 +47,7 @@ private:
     std::vector<char> readFile(const std::string& filename);
 // --------------------------------------------------------------------------------
 
-    void createGraphicsPipeline(VkExtent2D swapChainExtent, VkFormat swapChainImageFormat);
+    void createGraphicsPipeline();
 // --------------------------------------------------------------------------------
 
     void createRenderPass(VkFormat swapChainImageFormat);
